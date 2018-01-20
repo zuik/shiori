@@ -37,7 +37,10 @@ def api_links():
         req = request.get_json()
         links = req["links"]
         for link in links:
-            DB["links"].insert_one({"url":link})
+            DB["links"].insert_one({
+                "url":link,
+                "_id": hash(link)
+                })
         return jsonify({'success':True}), 200
 
 
