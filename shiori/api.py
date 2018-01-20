@@ -18,7 +18,7 @@ PUT /link/<id>
 """
 
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from shiori.config import DB
 
 api = Flask(__name__)
@@ -29,8 +29,17 @@ def api_links():
     """
     Create or list links
     """
-    links = DB["links"].find()
-    return jsonify(list(links))
+    if request.method == "GET":
+        links = DB["links"].find()
+        return jsonify(list(links))
+    else:
+        # Todo: Take this request handling out of the api main loop
+        req = request.get_json()
+        links = req["links"]
+        for link in links:
+            DB["links"].insert_one({"url":link})
+        return jsonify({'success':True}), 200
+
 
 @api.route("/link/<lid>")
 def api_link(lid):
